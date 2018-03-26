@@ -11,17 +11,6 @@ class SearchGoogle extends FlatSpec with Matchers with WebBrowser {
   implicit val webDriver: WebDriver = new FirefoxDriver()
   val host = "https://www.google.com"
 
-  def checkCarsCountOnGumtreePage(implicit driver: WebDriver): String = {
-    try {
-      val carCount = driver.findElement(By.tagName("h1")).findElement(By.className("h1-responsive"))
-      val carCountText = carCount.getText
-      val wordsList = carCountText.split(" ")
-      wordsList(0)
-    } catch {
-      case e: Exception => e.getMessage
-    }
-
-  }
 
 
   go to host
@@ -43,6 +32,19 @@ class SearchGoogle extends FlatSpec with Matchers with WebBrowser {
   val results = findAll(className("r")).toList
   var justGumtree = new ListBuffer[String]()
   assert(results.nonEmpty, "No result returned for search!")
+
+  def checkCarsCountOnGumtreePage(implicit driver: WebDriver): String = {
+    try {
+      val carCount = driver.findElement(By.tagName("h1")).findElement(By.className("h1-responsive"))
+      val carCountText = carCount.getText
+      val wordsList = carCountText.split(" ")
+      wordsList(0)
+    } catch {
+      case e: Exception => e.getMessage
+    }
+
+  }
+
 
   try {
     for (result <- results) {
