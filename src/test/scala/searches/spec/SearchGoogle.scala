@@ -6,28 +6,22 @@ import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.support.ui.{ExpectedConditions, WebDriverWait}
 import org.scalatest.selenium.WebBrowser
 import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.concurrent.Eventually._
 
 class SearchGoogle extends FlatSpec with Matchers with WebBrowser {
   implicit val webDriver: WebDriver = new FirefoxDriver()
-  val host = "https://www.google.com"
-
-
+  val host = "http://www.google.com/"
 
   go to host
+//  click on "q"
   textField("q").value = "Cars in London"
   submit()
 
-  try {
-    val wait = new WebDriverWait(webDriver, 5)
-    wait.until(ExpectedConditions.elementToBeClickable(By.className("r")))
-  } catch {
-    case e: TimeoutException => e
-    case b: Exception => b
-    case n: NullPointerException => n
+  eventually {
+    println(pageTitle)
+    pageTitle contains ("Cars in London")
+    textField("q").value should be("Cars in London")
   }
-
-  pageTitle contains ("Cars in London")
-  textField("q").value shouldBe ("Cars in London")
 
   val results = findAll(className("r")).toList
   var justGumtree = new ListBuffer[String]()
@@ -38,6 +32,7 @@ class SearchGoogle extends FlatSpec with Matchers with WebBrowser {
       val carCount = driver.findElement(By.tagName("h1")).findElement(By.className("h1-responsive"))
       val carCountText = carCount.getText
       val wordsList = carCountText.split(" ")
+      println(wordsList)
       wordsList(0)
     } catch {
       case e: Exception => e.getMessage
