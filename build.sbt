@@ -9,3 +9,4 @@ lazy val root = (project in file(".")).
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % Test
 libraryDependencies += "org.seleniumhq.selenium" % "selenium-java" % "3.10.0" % Test
+libraryDependencies +=  "org.scalaj" %% "scalaj-http" % "2.3.0"
