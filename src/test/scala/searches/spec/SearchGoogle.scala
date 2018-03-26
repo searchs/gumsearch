@@ -1,20 +1,30 @@
 package searches.spec
 
-import java.util
-
 import scala.collection.mutable.ListBuffer
 import org.openqa.selenium.{By, TimeoutException, WebDriver, WebElement}
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.support.ui.{ExpectedConditions, WebDriverWait}
 import org.scalatest.selenium.WebBrowser
-import org.scalatest.selenium.Page
-import org.scalatest.time.{Seconds, Span}
 import org.scalatest.{FlatSpec, Matchers}
 
 class SearchGoogle extends FlatSpec with Matchers with WebBrowser {
   implicit val webDriver: WebDriver = new FirefoxDriver()
+  val host = "https://www.google.com"
 
-  go to "http://www.google.com"
+  def checkCarsCountOnGumtreePage(implicit driver: WebDriver): String = {
+    try {
+      val carCount = driver.findElement(By.tagName("h1")).findElement(By.className("h1-responsive"))
+      val carCountText = carCount.getText
+      val wordsList = carCountText.split(" ")
+      wordsList(0)
+    } catch {
+      case e: Exception => e.getMessage
+    }
+
+  }
+
+
+  go to host
   textField("q").value = "Cars in London"
   submit()
 
@@ -30,7 +40,7 @@ class SearchGoogle extends FlatSpec with Matchers with WebBrowser {
   pageTitle contains ("Cars in London")
   textField("q").value shouldBe ("Cars in London")
 
-  val results = findAll(tagName("h3")).toSeq
+  val results = findAll(className("r")).toList
   var justGumtree = new ListBuffer[String]()
   assert(results.nonEmpty, "No result returned for search!")
 
@@ -43,15 +53,10 @@ class SearchGoogle extends FlatSpec with Matchers with WebBrowser {
 
     assert(justGumtree.nonEmpty, "No result with Gumtree Links!")
 
-    //  3.	Navigate to each Gumtree link and confirm the title is displayed and the number of the results is greater than 0.
-    def checkCarsCountOnGumtreePage(){}
-
     for (car <- justGumtree) {
       go to car
-      Thread.sleep(2000)
       pageTitle contains ("Gumtree")
-      println(currentUrl)
-      goBack()
+      checkCarsCountOnGumtreePage(webDriver)
     }
   } catch {
     case e: TimeoutException => e
