@@ -24,35 +24,17 @@ class GoogleSearchStepDefs extends ScalaDsl with EN with WebBrowser with Matcher
 
   Given("""^I am on Google homepage$""") { () =>
     go to "http://google.com"
-
-
   }
+
   When("""^I search for "([^"]*)"$""") { (searchTerm: String) =>
-    //    webDriver.findElement(By.name("q")).sendKeys(searchTerm)
     textField("q").value = searchTerm
     submit()
-
-
   }
-  When("""^Gumtree links in search result is greater than (\d+)$""") { (gumtreeCount: Int) =>
-    //    val results = webDriver.findElements(By.className(className("r")))
-    //    val results = findAll(className("r")).toList
-    //    var justGumtree = new ListBuffer[String]()
-    //    assert(results.nonEmpty, "No result returned for search!")
 
-    //    try {
-    //
-    //
-    //      for (result <- results) {
-    //        if (result.underlying.findElement(By.tagName("a")).getText.contains("Gumtree") || result.underlying.findElement(By.tagName("a")).getAttribute("href").contains("gumtree")) {
-    //          justGumtree += result.underlying.findElement(By.tagName("a")).getAttribute("href")
-    //        }
-    //      }
-    //
-    //
-    //    }
-    //    println(webDriver.getCurrentUrl)
-    //    val res = webDriver.findElements(By.className("r"))
+  When("""^Gumtree links in search result is greater than (\d+)$""") { (gumtreeCount: Int) =>
+    eventually {
+      pageTitle contains "Cars in London"
+    }
     val results = findAll(className("r"))
     assert(results.nonEmpty, "No result returned for search!")
 
@@ -60,7 +42,6 @@ class GoogleSearchStepDefs extends ScalaDsl with EN with WebBrowser with Matcher
 
   When("""^I click through each Gumtree link$""") { () =>
     val results = findAll(className("r")).toList
-    //    var justGumtree = new ListBuffer[String]()
 
     try {
       for (result <- results) {
@@ -69,53 +50,36 @@ class GoogleSearchStepDefs extends ScalaDsl with EN with WebBrowser with Matcher
         }
       }
       assert(justGumtree.nonEmpty, "No result with Gumtree Links!")
-
-
     }
-    Then("""^the title is displayed$""") { () =>
+  }
+
+    Then("""^the title is displayed and the number of results is greater than (\d+)$"""){ (carCountOnPage:Int) =>
       try {
         for (car <- justGumtree) {
           go to car
           pageTitle contains "Gumtree"
-          checkCarsCountOnGumtreePage(webDriver)
+          assert(checkCarsCountOnGumtreePage(webDriver).toInt > carCountOnPage, "No car listed on GumTree!")
         }
       } catch {
         case e: TimeoutException => e
         case b: Exception => b.getMessage
         case n: NullPointerException => n.getMessage
-      }
-      finally {
-        quit()
-      }
+      } finally  {quit()}
+
     }
 
-    Then("""^the number of results is greater than (\d+)$""") { (arg0: Int) =>
-      println("Pass")
-    }
 
-    def checkCarsCountOnGumtreePage(implicit driver: WebDriver): String = {
-      try {
+  def checkCarsCountOnGumtreePage(implicit driver: WebDriver): String = {
+    try {
 
-        val ele: Option[Element] = find(className("h1-responsive"))(driver)
-        println(ele.get.text)
-        val carCountText = ele.get.text
-        val wordsList = carCountText.split(" ").map(_.trim)
-        println(wordsList.toString)
-        wordsList(0)
-      } catch {
-        case e: Exception => e.getMessage
-      }
-
+      val ele: Option[Element] = find(className("h1-responsive"))(driver)
+      val carCountText = ele.get.text
+      val wordsList = carCountText.split(" ").map(_.trim)
+      wordsList(0)
+    } catch {
+      case e: Exception => e.getMessage
     }
 
   }
 
-  Then("""^the title is displayed$""") { () =>
-    //// Write code here that turns the phrase above into concrete actions
-    println("Done Not")
-  }
-  Then("""^the number of results is greater than (\d+)$""") { (arg0: Int) =>
-    Thread.sleep(5000)
-    quit()
-  }
 }
