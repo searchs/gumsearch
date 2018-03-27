@@ -7,39 +7,29 @@ import org.openqa.selenium.support.ui.{ExpectedConditions, WebDriverWait}
 import org.scalatest.selenium.WebBrowser
 import org.scalatest.{FlatSpec, Matchers}
 import org.scalatest.concurrent.Eventually._
+import org.scalatest.time.{Seconds, Span}
+import searches.spec.pagemodel.{GoogleHomepage, GoogleSearchResultsPage}
+
+import scala.util.Try
 
 class SearchGoogle extends FlatSpec with Matchers with WebBrowser {
-  implicit val webDriver: WebDriver = new FirefoxDriver()
-  val host = "http://www.google.com/"
 
-  go to host
-//  click on "q"
+  implicit val webDriver: WebDriver = new FirefoxDriver()
+  implicitlyWait(Span(3, Seconds))
+  //  val host = "http://www.google.com"
+  val googleSearchResultsPage = new GoogleSearchResultsPage()
+  go to GoogleHomepage.url
   textField("q").value = "Cars in London"
   submit()
 
   eventually {
-    println(pageTitle)
-    pageTitle contains ("Cars in London")
-    textField("q").value should be("Cars in London")
+    pageTitle contains "Cars in London"
+    textField("q").value shouldBe "Cars in London"
   }
 
   val results = findAll(className("r")).toList
   var justGumtree = new ListBuffer[String]()
   assert(results.nonEmpty, "No result returned for search!")
-
-  def checkCarsCountOnGumtreePage(implicit driver: WebDriver): String = {
-    try {
-      val carCount = driver.findElement(By.tagName("h1")).findElement(By.className("h1-responsive"))
-      val carCountText = carCount.getText
-      val wordsList = carCountText.split(" ")
-      println(wordsList)
-      wordsList(0)
-    } catch {
-      case e: Exception => e.getMessage
-    }
-
-  }
-
 
   try {
     for (result <- results) {
@@ -52,7 +42,7 @@ class SearchGoogle extends FlatSpec with Matchers with WebBrowser {
 
     for (car <- justGumtree) {
       go to car
-      pageTitle contains ("Gumtree")
+      pageTitle contains "Gumtree"
       checkCarsCountOnGumtreePage(webDriver)
     }
   } catch {
@@ -63,5 +53,21 @@ class SearchGoogle extends FlatSpec with Matchers with WebBrowser {
   finally {
     quit()
   }
+
+  def checkCarsCountOnGumtreePage(implicit driver: WebDriver): String = {
+    try {
+
+      val ele: Option[Element] = find(className("h1-responsive"))(driver)
+      println(ele.get.text)
+      val carCountText = ele.get.text
+      val wordsList = carCountText.split(" ").map(_.trim)
+      println(wordsList.toString)
+      wordsList(0)
+    } catch {
+      case e: Exception => e.getMessage
+    }
+
+  }
+
 
 }
