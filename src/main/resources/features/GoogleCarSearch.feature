@@ -6,5 +6,4 @@ Feature: Google Search Lands on Gumtree
     When I search for "Cars in London"
     And Gumtree links in search result is greater than 0
     When I click through each Gumtree link
-    Then the title is displayed
-    And the number of results is greater than 0
+    Then the title is displayed and the number of results is greater than 0
