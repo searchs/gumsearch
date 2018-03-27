@@ -1,0 +1,7 @@
+package pageModels
+
+
+
+class GoogleHome {
+
+}
