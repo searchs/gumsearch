@@ -6,8 +6,8 @@ import org.junit.runner.RunWith
 
 @RunWith(classOf[Cucumber])
 @CucumberOptions(
-  features = Array("classpath:features/GoogleCarSearch.feature"),
+  features = Array("classpath:features"),
   tags = Array("~@Wip"),
-  glue = Array("classpath:steps"),
+  glue = Array("steps"),
   plugin = Array("pretty", "html:target/cucumber/html"))
 class RunCucumber
