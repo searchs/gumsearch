@@ -1,7 +1,8 @@
 package searches.spec.pagemodel
 
 import org.openqa.selenium.{WebDriver, WebElement}
-import org.scalatest.selenium.Page
+import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.selenium.{Page, WebBrowser}
 
 object GoogleHomepage extends Page{
   override val url: String = "http://www.google.com"
@@ -9,13 +10,7 @@ object GoogleHomepage extends Page{
 
 }
 
-class GoogleSearchResultsPage extends Page {
-  override val url: String = GoogleHomepage.url
-
-//  def getGoogleSearchResults(): List[WebElement] ={
-//    val results: WebElement =Try(driver.findElement(By.id("tab-hotel-tab"))).getOrElse(null)
-//    click on hotelTab
-//  }
-
+class GoogleSearchResultsPage extends FlatSpec with WebBrowser with Matchers {
+   val url: String = GoogleHomepage.url
 
 }
